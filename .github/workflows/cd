@@ -1,0 +1,25 @@
+name: CD
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout  
+      - uses: actions/checkout@v2
+
+      # Step 2: Add SSH credentials to your GitHub CI/CD instance 
+      - name: Add SSH Credentials
+        uses: shimatoro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }} 
+
+      # Step 3: Deploy!
+      - name: Deploy to Staging
+        uses: JorgenVatle/docker-compose-deploy@v1.0
+        with:
+          deploy_targets: 'server-1.example.com, server-2.example.com' # required, comma separated list of servers to deploy to.
+          compose_file: 'docker-compose.yaml' # optional, path/filename of your docker-compose file. Defaults to 'docker-compose.yml'
+          
